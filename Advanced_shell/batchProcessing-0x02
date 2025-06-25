@@ -16,5 +16,25 @@ fi
 
 for POKEMON_NAME in "${names[@]}"; do
     echo "Processing $POKEMON_NAME..."
-    ./apiAutomation-0x00.sh "$POKEMON_NAME"
+    API_URL="https://pokeapi.co/api/v2/pokemon/${POKEMON_NAME}/"
+DATA_FILE="$POKEMON_NAME.json"
+ERROR_FILE="errors.txt"
+
+echo "retrieving data for $POKEMON_NAME from $API_URL..."
+HTTP_STATUS=$(curl -s -o "$DATA_FILE" -w "%{http_code}" "$API_URL")
+if [ "$HTTP_STATUS" -eq 200 ]; then
+    echo "Successfully retrieved data for $POKEMON_NAME. Data saved to $DATA_FILE"
+else
+    TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+    ERROR_MESSAGE="[$TIMESTAMP] Failed to retrieve data for $POKEMON_NAME. HTTP Status: $HTTP_STATUS"
+
+    
+    if [ ! -s "$DATA_FILE" ]; then
+        ERROR_MESSAGE+=". No data written to $DATA_FILE (file is empty or not created)."
+    fi
+
+    echo "$ERROR_MESSAGE" | tee -a "$ERROR_FILE" >&2
+    echo "Error details logged to $ERROR_FILE"
+   rm -f "$DATA_FILE"
+fi
 done
