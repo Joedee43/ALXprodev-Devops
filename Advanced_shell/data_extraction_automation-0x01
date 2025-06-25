@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#“Pikachu is of type Electric, weighs 6kg, and is 0.4m tall.”
+data_file="data.json"
+if [ ! -f "$data_file" ]; then
+    echo "Data file $data_file does not exist."
+    exit 1
+fi
+jq -r '"\(.name) is of type \(.types[0].type.name), weighs \(.weight)kg, and is \(.height)m tall."' "$data_file"
