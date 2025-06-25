@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -x
+set -e
+
+API_URL="https://pokeapi.co/api/v2/pokemon/"
+names=()
+echo "retrieving names form $API_URL..."
+HTTP_STATUS=$(curl -s -w "%{http_code}" "$API_URL")
+if [ "$HTTP_STATUS" -eq 200 ]; then
+    names=($(curl -s "$API_URL" | jq -r '\(.name)'))
+    echo "Successfully retrieved names: ${names[*]}"
+else
+    echo "Failed to retrieve names. HTTP Status: $HTTP_STATUS"
+fi
+
+for POKEMON_NAME in "${names[@]}"; do
+    echo "Processing $POKEMON_NAME..."
+    ./apiAutomation-0x00.sh "$POKEMON_NAME"
+done
