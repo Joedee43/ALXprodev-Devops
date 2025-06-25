@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# List of Pokémon to fetch
+pokemon_list=(Bulbasaur Ivysaur Venusaur Charmander Charmeleon)
+API_BASE_URL="https://pokeapi.co/api/v2/pokemon/"
+
+# Create output directory if not exists
+mkdir -p fetched_data
+
+echo "Fetching data in parallel..."
+
+# Loop through Pokémon and fetch data in background
+for pokemon in "${pokemon_list[@]}"; do
+    # Start a background curl process for each Pokémon
+    curl -s "${API_BASE_URL}${pokemon,,}" -o "fetched_data/${pokemon}.json" &
+done
+
+# Wait for all background jobs to finish
+wait
+
+echo "✅ All data fetched successfully and saved in 'fetched_data/' directory."
